@@ -11,6 +11,9 @@ if (!process.env.MONGODB_URI) {
 // express
 const app: Application = express();
 
+// body를 json으로 파싱하는 미들웨어 추가
+app.use(express.json());
+
 // 카카오 로그인 관련 로직이 모여있는 라우터를 app에 연결
 app.use("/kakao", kakaoRouter);
 const port: number = 3001;

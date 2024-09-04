@@ -1,3 +1,6 @@
+import axios from "axios";
+import { KakaoResult } from "../types/kakao_login/kakaoLoginType";
+
 require("dotenv").config();
 
 /**
@@ -20,6 +23,37 @@ class Kakao {
    */
   getAuthCodeUrl() {
     return `https://kauth.kakao.com/oauth/authorize?client_id=${this.key}&redirect_uri=${this.redirectUri}&response_type=code`;
+  }
+
+  /**
+   * @description 프론트에서 받은 인가 코드를 통해 kakaoToken을 받아오는 함수
+   * @see https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
+   */
+  async getKakaoToken(code: string) {
+    const params = {
+      client_id: this.key,
+      code: code,
+      grant_type: "authorization_code",
+      redirect_uri: this.redirectUri,
+    };
+
+    const data: KakaoResult = await axios
+      .post("https://kauth.kakao.com/oauth/token", params, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .then((data) => data.data)
+      .catch((err) => console.error("getKakaoToken function Error: ", err));
+
+    const tokenData = {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+    };
+
+    console.log(tokenData);
+
+    return tokenData;
   }
 }
 
