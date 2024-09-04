@@ -22,10 +22,18 @@ router.post("/login", async (req: Request, res: Response) => {
   console.log("POST /kakao/login start");
   try {
     const body: LoginBody = req.body;
-    console.log("body: ", body);
+    console.log("인가코드 body: ", body);
     const kakaoToken: KakaoTokenData = await KakaoClient.getKakaoToken(
       body.code
     );
+    const userData = await KakaoClient.getUserData(kakaoToken);
+
+    console.log("최종적으로 사용할 userData: ", userData);
+
+    // Todo: DB에 사용자 등록
+    // jwt 토큰
+
+    res.status(200).json(userData);
   } catch (err) {
     console.error("POST /kakao/login Error: ", err);
     res.status(500).json({ error: `Failed to kakao login: ${err}` });

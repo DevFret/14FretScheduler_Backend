@@ -1,5 +1,9 @@
 import axios from "axios";
-import { KakaoResult } from "../types/kakao_login/kakaoLoginType";
+import {
+  KakaoResult,
+  KakaoTokenData,
+  UserData,
+} from "../types/kakao_login/kakaoLoginType";
 
 require("dotenv").config();
 
@@ -46,14 +50,37 @@ class Kakao {
       .then((data) => data.data)
       .catch((err) => console.error("getKakaoToken function Error: ", err));
 
-    const tokenData = {
+    const tokenData: KakaoTokenData = {
       access_token: data.access_token,
       refresh_token: data.refresh_token,
     };
 
-    console.log(tokenData);
+    console.log("kakaoTokenData: ", tokenData);
 
     return tokenData;
+  }
+
+  /**
+   * @description 받아온 kakaoToken의 access_token을 사용해 userData를 받아오는 함수
+   */
+  async getUserData(token: KakaoTokenData) {
+    const data = await axios
+      .get("https://kapi.kakao.com/v2/user/me", {
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      })
+      .then((data) => data.data)
+      .catch((err) => console.error("getUserData function Error: ", err));
+
+    console.log("raw user data: ", data);
+
+    const userData: UserData = {
+      id: data.id,
+      nickname: data.kakao_account.profile.nickname,
+    };
+
+    return userData;
   }
 }
 
