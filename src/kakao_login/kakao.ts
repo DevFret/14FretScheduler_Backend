@@ -1,11 +1,12 @@
 import axios from "axios";
+import dotenv from "dotenv";
 import {
   KakaoResult,
   KakaoTokenData,
   UserData,
 } from "../types/kakao_login/kakaoLoginType";
 
-require("dotenv").config();
+dotenv.config();
 
 /**
  * @description Kakao 로그인 관련 로직과 값이 모인 Class
@@ -54,8 +55,7 @@ class Kakao {
       access_token: data.access_token,
       refresh_token: data.refresh_token,
     };
-
-    console.log("kakaoTokenData: ", tokenData);
+    // console.log("kakaoTokenData: ", tokenData);
 
     return tokenData;
   }
@@ -72,8 +72,7 @@ class Kakao {
       })
       .then((data) => data.data)
       .catch((err) => console.error("getUserData function Error: ", err));
-
-    console.log("raw user data: ", data);
+    // console.log("raw user data: ", data);
 
     const userData: UserData = {
       id: data.id,

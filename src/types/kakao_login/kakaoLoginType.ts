@@ -1,7 +1,3 @@
-export type LoginBody = {
-  code: string;
-};
-
 export type KakaoResult = {
   access_token: string;
   token_type: "bearer";
