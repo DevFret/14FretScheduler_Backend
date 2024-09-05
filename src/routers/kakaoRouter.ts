@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { KakaoClient } from "./kakao";
+import { KakaoClient } from "../utils/kakao";
 import { KakaoTokenData } from "../types/kakao_login/kakaoLoginType";
 import handleLogin from "../utils/handleLogin";
 
