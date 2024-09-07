@@ -1,9 +1,9 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import dotenv from "dotenv";
 import {
   KakaoResult,
   KakaoTokenData,
-  UserData,
+  KakaoUserData,
 } from "../types/kakao_login/kakaoLoginType";
 
 dotenv.config();
@@ -42,44 +42,57 @@ class Kakao {
       redirect_uri: this.redirectUri,
     };
 
-    const data: KakaoResult = await axios
-      .post("https://kauth.kakao.com/oauth/token", params, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      })
-      .then((data) => data.data)
-      .catch((err) => console.error("getKakaoToken function Error: ", err));
-
-    const tokenData: KakaoTokenData = {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-    };
-    // console.log("kakaoTokenData: ", tokenData);
-
-    return tokenData;
+    try {
+      const data = await axios.post<KakaoResult>(
+        "https://kauth.kakao.com/oauth/token",
+        params,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      if (data.data) {
+        const tokenData: KakaoTokenData = {
+          access_token: data.data.access_token,
+          refresh_token: data.data.refresh_token,
+        };
+        return tokenData;
+      }
+    } catch (err) {
+      if (isAxiosError(err)) {
+        console.error(
+          `getKakaoToken func Error: ${err.status}, ${err.response?.data}`
+        );
+      }
+    }
   }
 
   /**
    * @description 받아온 kakaoToken의 access_token을 사용해 userData를 받아오는 함수
    */
   async getUserData(token: KakaoTokenData) {
-    const data = await axios
-      .get("https://kapi.kakao.com/v2/user/me", {
-        headers: {
-          Authorization: `Bearer ${token.access_token}`,
-        },
-      })
-      .then((data) => data.data)
-      .catch((err) => console.error("getUserData function Error: ", err));
-    // console.log("raw user data: ", data);
-
-    const userData: UserData = {
-      id: data.id,
-      nickname: data.kakao_account.profile.nickname,
-    };
-
-    return userData;
+    try {
+      const response = await axios.get<KakaoUserData>(
+        "https://kapi.kakao.com/v2/user/me",
+        {
+          headers: {
+            Authorization: `Bearer ${token.access_token}`,
+          },
+        }
+      );
+      const userData = {
+        id: response.data.id,
+        nickname: response.data.kakao_account.profile.nickname,
+      };
+      return userData;
+    } catch (err) {
+      if (isAxiosError(err)) {
+        console.error(
+          `getUserData function Error: ${err.status}, ${err.response?.data} `
+        );
+      }
+    }
   }
 }
 

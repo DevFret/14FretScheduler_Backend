@@ -13,6 +13,15 @@ export type KakaoTokenData = {
   refresh_token: string;
 };
 
+export type KakaoUserData = {
+  id: string;
+  kakao_account: {
+    profile: {
+      nickname: string;
+    };
+  };
+};
+
 export type UserData = {
   id: string;
   nickname: string;
