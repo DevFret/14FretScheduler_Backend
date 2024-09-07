@@ -1,4 +1,5 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
+import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { kakaoRouter } from "./routers/kakaoRouter";
@@ -15,6 +16,9 @@ const app: Application = express();
 
 // body를 json으로 파싱하는 미들웨어 추가
 app.use(express.json());
+
+// cors 설정
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // 로그인, 인증 관련 로직이 모여있는 라우터를 app에 연결
 app.use("/kakao", kakaoRouter); // kakao 인가코드 받기 - 토큰 받기 관련 라우터
