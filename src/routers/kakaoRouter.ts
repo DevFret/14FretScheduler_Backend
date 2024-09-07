@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
 import { KakaoClient } from "../utils/kakao";
-import { KakaoTokenData } from "../types/kakao_login/kakaoLoginType";
 import handleLogin from "../utils/handleLogin";
 
 const router = Router();
@@ -24,13 +23,15 @@ router.post("/login", async (req: Request, res: Response) => {
   console.log("POST /kakao/login start");
   try {
     const { code }: { code: string } = req.body;
-    const kakaoToken: KakaoTokenData = await KakaoClient.getKakaoToken(code);
-    const userData = await KakaoClient.getUserData(kakaoToken);
-
-    console.log("최종적으로 사용할 userData: ", userData);
-
-    const dataWithJWT = await handleLogin(userData);
-    res.status(200).json(dataWithJWT);
+    const kakaoToken = await KakaoClient.getKakaoToken(code);
+    if (kakaoToken) {
+      const userData = await KakaoClient.getUserData(kakaoToken);
+      if (userData) {
+        console.log("최종적으로 사용할 userData: ", userData);
+        const dataWithJWT = await handleLogin(userData);
+        res.status(200).json(dataWithJWT);
+      }
+    }
   } catch (err) {
     console.error("POST /kakao/login Error: ", err);
   }
